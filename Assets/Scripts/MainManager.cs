@@ -3,22 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.IO;
+using TMPro;
 
 public class MainManager : MonoBehaviour
 {
+    public static MainManager Instance;
+    
     public Brick BrickPrefab;
     public int LineCount = 6;
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text BestScoreText;
     public GameObject GameOverText;
+
     
     private bool m_Started = false;
     private int m_Points;
     
     private bool m_GameOver = false;
 
-    
+
     // Start is called before the first frame update
     void Start()
     {
@@ -36,6 +42,14 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+
+        if (DataPersistance.Instance.playerName.Trim().Length == 0)
+        {
+            DataPersistance.Instance.playerName = "Guest";
+        }
+
+
+     
     }
 
     private void Update()
@@ -60,6 +74,9 @@ public class MainManager : MonoBehaviour
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
         }
+
+        BestScoreText.text = "Best Score: " + DataPersistance.Instance.playerName + " : " + DataPersistance.Instance.bestScore.ToString();
+
     }
 
     void AddPoint(int point)
@@ -72,5 +89,14 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+
+        if (m_Points > DataPersistance.Instance.bestScore)
+        {
+            DataPersistance.Instance.playersBestScore = DataPersistance.Instance.playerName;
+            DataPersistance.Instance.bestScore = m_Points;
+        }
+
     }
+
+
 }
